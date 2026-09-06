@@ -41,6 +41,11 @@
   --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.3);
 }
 *{box-sizing:border-box}
+/* 這條一定要在，而且要 !important。
+   篩選是用 tr.hidden = true 隱藏列，靠瀏覽器預設的 [hidden]{display:none}，
+   但手機版把表格改成卡片時寫了 tbody tr{display:block}，
+   那條的優先權比 [hidden] 高 —— 結果手機上篩選完全沒作用（桌機正常）。 */
+[hidden]{display:none!important}
 body{
   margin:0; background:var(--bg); color:var(--ink);
   font:16px/1.65 "Noto Sans TC",-apple-system,BlinkMacSystemFont,
@@ -258,7 +263,7 @@ tr.dead .title-cell a{text-decoration:line-through}
  <p class="stand">從 591、好房網、樂屋網整理出來的 386 間，
   每一間都重新開過網址確認還在。<b>電話直接點就能打</b>，
   不用進原網站（591 手機版要登入綁 LINE 才給看電話，這裡已經幫你抓好了）。</p>
- <p class="stamp">整理時間 2026-09-06 20:43　·
+ <p class="stamp">整理時間 2026-09-06 20:55　·
   東區 230
   北區 128
   香山區 28</p>
