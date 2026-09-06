@@ -124,6 +124,17 @@ summary .live{
                                    outline-offset:2px}
 
 /* ---- 說明 ---- */
+#lineBar{
+  display:none;background:var(--accent);color:#fff;border-radius:10px;
+  padding:12px 14px;margin:0 0 14px;font-size:14px;line-height:1.6;
+}
+#lineBar.on{display:block}
+#lineBar b{display:block;margin-bottom:8px}
+#lineBar a{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#fff;color:var(--accent);font-weight:700;text-decoration:none;
+  padding:10px 16px;border-radius:8px;min-height:44px;font-size:15px;
+}
 .note{
   background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);
   border-radius:10px;padding:12px 15px;font-size:13.5px;line-height:1.75;
@@ -247,11 +258,18 @@ tr.dead .title-cell a{text-decoration:line-through}
  <p class="stand">從 591、好房網、樂屋網整理出來的 386 間，
   每一間都重新開過網址確認還在。<b>電話直接點就能打</b>，
   不用進原網站（591 手機版要登入綁 LINE 才給看電話，這裡已經幫你抓好了）。</p>
- <p class="stamp">整理時間 2026-09-06 20:17　·
+ <p class="stamp">整理時間 2026-09-06 20:19　·
   東區 242
   北區 116
   香山區 28</p>
 </header>
+
+<div id="lineBar">
+ <b>你正在 LINE 內建瀏覽器裡看這頁</b>
+ 從這裡點進 591 會被要求綁定 LINE 才能看電話。改用手機瀏覽器開就不會。
+ （這頁的電話本來就能直接點，不受影響。）
+ <div style="margin-top:10px"><a id="lineBtn" href="#">改用瀏覽器開啟</a></div>
+</div>
 
 <details class="filters" open>
  <summary>篩選條件<span class="live"><span id="liveCount">386</span> 間</span></summary>
@@ -382,6 +400,21 @@ tr.dead .title-cell a{text-decoration:line-through}
   document.addEventListener("change", function (e) {
     if (e.target.closest(".fbody")) apply();
   });
+  // LINE 內建瀏覽器：從這裡點出去的連結會困在 app 裡，591 就會要求綁 LINE。
+  // LINE 官方支援在網址後面加 openExternalBrowser=1 強制跳外部瀏覽器。
+  var inLine = /Line\//i.test(navigator.userAgent);
+  function ext(u) {
+    if (!u || u.indexOf("http") !== 0) return u;
+    if (u.indexOf("openExternalBrowser=") > -1) return u;
+    return u + (u.indexOf("?") > -1 ? "&" : "?") + "openExternalBrowser=1";
+  }
+  if (inLine) {
+    document.getElementById("lineBar").className = "on";
+    document.getElementById("lineBtn").href = ext(location.href);
+    document.querySelectorAll("a[target='_blank']").forEach(function (a) {
+      a.href = ext(a.getAttribute("href"));
+    });
+  }
   $("f_reset").addEventListener("click", reset);
   $("f_quick").addEventListener("click", function () {
     reset();          // reset 已保留 3房2廳2衛 的基本需求
