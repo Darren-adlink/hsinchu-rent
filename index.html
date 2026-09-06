@@ -258,7 +258,7 @@ tr.dead .title-cell a{text-decoration:line-through}
  <p class="stand">從 591、好房網、樂屋網整理出來的 386 間，
   每一間都重新開過網址確認還在。<b>電話直接點就能打</b>，
   不用進原網站（591 手機版要登入綁 LINE 才給看電話，這裡已經幫你抓好了）。</p>
- <p class="stamp">整理時間 2026-09-06 20:19　·
+ <p class="stamp">整理時間 2026-09-06 20:21　·
   東區 242
   北區 116
   香山區 28</p>
@@ -402,7 +402,9 @@ tr.dead .title-cell a{text-decoration:line-through}
   });
   // LINE 內建瀏覽器：從這裡點出去的連結會困在 app 裡，591 就會要求綁 LINE。
   // LINE 官方支援在網址後面加 openExternalBrowser=1 強制跳外部瀏覽器。
-  var inLine = /Line\//i.test(navigator.userAgent);
+  // 用 indexOf 不用 regex：這段 JS 是包在 Python 的一般字串裡，
+  // 寫  會被 Python 當成退格字元吃掉，regex 就永遠不會成立。
+  var inLine = navigator.userAgent.indexOf("Line/") > -1;
   function ext(u) {
     if (!u || u.indexOf("http") !== 0) return u;
     if (u.indexOf("openExternalBrowser=") > -1) return u;
