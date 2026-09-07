@@ -290,6 +290,12 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
 .leaflet-popup-content a{color:#0b5cad;font-weight:700}
 .mapnote{padding:9px 14px;font-size:12px;color:var(--ink-3);
          border-top:1px solid var(--line-2)}
+.distpill{display:inline-block;margin-top:3px;padding:2px 8px;border-radius:999px;
+          background:var(--line-2);color:var(--ink-2);font-size:11.5px;
+          font-weight:700;white-space:nowrap}
+.distpill.near{background:#e8582c1f;color:#c1441c}
+:root[data-theme="dark"] .distpill.near,
+:root:not([data-theme="light"]) .distpill.near{color:#ff9b78}
 </style>
 </head>
 <body>
@@ -299,7 +305,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
  <p class="stand">從 591、好房網、樂屋網整理出來的 386 間，
   每一間都重新開過網址確認還在。<b>電話直接點就能打</b>，
   不用進原網站（591 手機版要登入綁 LINE 才給看電話，這裡已經幫你抓好了）。</p>
- <p class="stamp">整理時間 2026-09-08 04:51　·
+ <p class="stamp">整理時間 2026-09-08 05:20　·
   東區 230
   北區 128
   香山區 28</p>
@@ -350,11 +356,12 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
    <label class="chip"><input type="checkbox" id="f_wor">明確可拜拜</label>
    <label class="chip"><input type="checkbox" id="f_alive" checked>只看還在的</label>
    <label class="chip"><input type="checkbox" id="f_fav">只看我的最愛 (<span id="favCount">0</span>)</label>
+   <span class="unit"><input class="num u" type="number" id="f_km" placeholder="距離" step="0.5" inputmode="decimal" aria-label="離食品路540號幾公里內"><b>公里內</b></span>
   </div>
   <div class="frow">
    <span class="flab">關鍵字</span>
    <input class="txt" type="text" id="f_kw" placeholder="路名、社區、仲介、電話…">
-   <button class="btn primary" id="f_quick" type="button">東區 · 2樓以上</button>
+   <button class="btn primary" id="f_quick" type="button">食品路540號 2 公里內</button>
    <button class="btn" id="f_reset" type="button">清除</button>
   </div>
  </div>
@@ -406,6 +413,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
     var noWhole = $("f_nowhole").checked, worOk = $("f_wor").checked;
     var aliveOnly = $("f_alive").checked;
     var favOnly = $("f_fav") && $("f_fav").checked;
+    var kmMax = num("f_km");
     var kw = ($("f_kw").value || "").trim().toLowerCase();
     var shown = 0;
     document.querySelectorAll("table.data tbody tr").forEach(function (tr) {
@@ -428,6 +436,8 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
       if (ok && worOk && d.wor !== "\u53ef") ok = false;
       if (ok && aliveOnly && d.alive !== "1") ok = false;
       if (ok && favOnly && !(window.__isFav && window.__isFav(d.id))) ok = false;
+      // 沒有座標的物件在設距離條件時會被濾掉——因為真的不知道它在哪
+      if (ok && kmMax !== null && (!d.km || +d.km > kmMax)) ok = false;
       if (ok && kw && (d.kw || "").indexOf(kw) < 0) ok = false;
       tr.hidden = !ok;
       if (ok) shown++;
@@ -475,10 +485,11 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
   }
   $("f_reset").addEventListener("click", reset);
   $("f_quick").addEventListener("click", function () {
-    reset();          // reset 已保留 3房2廳2衛 的基本需求
-    document.querySelectorAll("input[name='f_dist']").forEach(function (c) {
-      c.checked = (c.value === "\u6771\u5340");
-    });
+    reset();     // reset 保留 3房2廳2衛 的基本需求
+    $("f_km").value = "2";      // 距食品路540號 2 公里內
+    apply();
+    document.querySelector("h2.sec").scrollIntoView({ behavior: "smooth" });
+  });
     $("f_flmin").value = "2";
     apply();
     document.querySelector("h2.sec").scrollIntoView({ behavior: "smooth" });
@@ -488,6 +499,36 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
 
 (function () {
   var KEY = "fav_rent";
+  // 參考點：新竹市食品路540號（振興里/四維路口）。
+  // 座標來自 OpenStreetMap 結構化查詢，並用食品路331號（食品工業發展研究所，
+  // 24.79326,120.97072）交叉驗證門牌遞增方向一致。
+  var REF = { lat: 24.7950832, lng: 120.9651862, name: "食品路540號", radius: 2000 };
+
+  function km(lat1, lng1, lat2, lng2) {          // 直線距離（Haversine）
+    var R = 6371, t = Math.PI / 180;
+    var dLat = (lat2 - lat1) * t, dLng = (lng2 - lng1) * t;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+          + Math.cos(lat1 * t) * Math.cos(lat2 * t)
+          * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  // 每筆算好距離，寫進 data-km，並顯示在卡片上
+  document.querySelectorAll("table.data tbody tr").forEach(function (tr) {
+    if (!tr.dataset.lat) return;
+    var d = km(REF.lat, REF.lng, parseFloat(tr.dataset.lat),
+               parseFloat(tr.dataset.lng));
+    tr.dataset.km = d.toFixed(2);
+    var meta = tr.querySelector(".meta");
+    if (meta) {
+      var sp = document.createElement("span");
+      sp.className = "distpill" + (d <= 2 ? " near" : "");
+      sp.textContent = "距" + REF.name + " " + (d < 1 ? Math.round(d * 1000) + " 公尺"
+                                                      : d.toFixed(1) + " 公里");
+      meta.appendChild(document.createElement("br"));
+      meta.appendChild(sp);
+    }
+  });
+  window.__REF = REF;
   var favs;
   try { favs = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); }
   catch (e) { favs = new Set(); }          // 無痕視窗／擋 cookie 時會丟例外
@@ -532,6 +573,15 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
       attribution: "&copy; OpenStreetMap"
     }).addTo(map);
     layer = L.layerGroup().addTo(map);
+    // 參考點與 2 公里圈
+    L.circle([REF.lat, REF.lng], {
+      radius: REF.radius, color: "#e8582c", weight: 2,
+      fillColor: "#e8582c", fillOpacity: 0.07
+    }).addTo(map).bindPopup("距 " + REF.name + " 2 公里");
+    L.circleMarker([REF.lat, REF.lng], {
+      radius: 8, color: "#fff", weight: 2,
+      fillColor: "#e8582c", fillOpacity: 1
+    }).addTo(map).bindPopup("<b>" + REF.name + "</b><br>參考點");
     built = true;
     refreshMap();
     setTimeout(function () { map.invalidateSize(); }, 60);
@@ -547,15 +597,20 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
       n++;
       pts.push([lat, lng]);
       var star = window.__isFav(tr.dataset.id) ? "★ " : "";
+      var dtxt = tr.dataset.km ? ("　距" + window.__REF.name + " "
+                                  + tr.dataset.km + " 公里<br>") : "";
       var html = "<b>" + star + (tr.dataset.title || "") + "</b><br>"
-               + (tr.dataset.sub || "") + "<br>"
+               + (tr.dataset.sub || "") + "<br>" + dtxt
                + "<a href='" + tr.dataset.url + "' target='_blank' rel='noopener'>"
                + "看原始刊登 &rarr;</a>";
       L.marker([lat, lng]).addTo(layer).bindPopup(html);
     });
     var c = document.getElementById("mapCount");
     if (c) c.textContent = n;
-    if (pts.length) { map.fitBounds(pts, { padding: [28, 28], maxZoom: 16 }); }
+    if (pts.length) {
+      map.fitBounds(pts.concat([[REF.lat, REF.lng]]),
+                    { padding: [28, 28], maxZoom: 16 });
+    }
   }
   window.__refreshMap = refreshMap;
   var box = document.querySelector("details.mapbox");
