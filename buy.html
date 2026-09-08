@@ -348,9 +348,15 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
  <h1>新竹市買房 · 3房2廳2衛以上</h1>
  <p class="stand">591 售屋網的 新竹市 物件，符合條件 <b>1904</b> 間。
   中位價 <b>2,288萬</b>，其中 <b>800 萬以內只有 26 間</b>。</p>
- <p class="stamp">整理時間 2026-09-08 05:57</p>
+ <p class="stamp">整理時間 2026-09-08 08:28</p>
 <p style="margin:6px 0 0"><a class="navlink" href="./" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--accent);border-radius:8px;color:var(--accent);text-decoration:none;font-weight:700;font-size:14px">看租屋 →</a></p>
 </header>
+
+<div id="lineBar">
+ <b>你正在 LINE 內建瀏覽器裡看這頁</b>
+ 從這裡點進 591 會被要求綁定 LINE。改用手機瀏覽器開就不會。
+ <div style="margin-top:10px"><a id="lineBtn" href="#">改用瀏覽器開啟</a></div>
+</div>
 
 
 <details class="mapbox">
@@ -504,6 +510,13 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
   // LINE 內建瀏覽器：所有外連已寫死 openExternalBrowser=1，這裡再補橫幅
   var inLine = navigator.userAgent.indexOf("Line/") > -1;
   if (inLine) {
+    var bar = document.getElementById("lineBar");
+    if (bar) { bar.className = "on"; }
+    var btn = document.getElementById("lineBtn");
+    if (btn) {
+      var h = location.href;
+      btn.href = h + (h.indexOf("?") > -1 ? "&" : "?") + "openExternalBrowser=1";
+    }
     document.querySelectorAll("a[target='_blank']").forEach(function (a) {
       var u = a.getAttribute("href");
       if (u && u.indexOf("openExternalBrowser=") < 0 && u.indexOf("http") === 0) {
