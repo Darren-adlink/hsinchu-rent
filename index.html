@@ -283,7 +283,15 @@ details.mapbox>summary::before{
 }
 details.mapbox[open]>summary::before{transform:rotate(45deg)}
 summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
-#map{height:440px;width:100%;background:var(--line-2)}
+#map{height:440px;width:100%;background:var(--line-2);position:relative}
+.maphint{
+  position:absolute;left:50%;transform:translateX(-50%);bottom:10px;z-index:500;
+  background:rgba(22,26,34,.82);color:#fff;font-size:12px;font-weight:700;
+  padding:5px 12px;border-radius:999px;pointer-events:none;white-space:nowrap;
+}
+#map.wheel-on .maphint{background:rgba(47,75,216,.9)}
+#map.wheel-on{box-shadow:inset 0 0 0 2px var(--accent)}
+@media (hover:none){.maphint{display:none}}   /* 手機用雙指縮放，不需要提示 */
 @media (max-width:900px){#map{height:340px}}
 .leaflet-popup-content{margin:10px 12px;font-size:13px;line-height:1.6}
 .leaflet-popup-content b{font-size:14px}
@@ -306,7 +314,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
  <p class="stand">從 591、好房網、樂屋網整理出來的 386 間，
   每一間都重新開過網址確認還在。<b>電話直接點就能打</b>，
   不用進原網站（591 手機版要登入綁 LINE 才給看電話，這裡已經幫你抓好了）。</p>
- <p class="stamp">整理時間 2026-09-08 05:44　·
+ <p class="stamp">整理時間 2026-09-08 08:31　·
   東區 230
   北區 128
   香山區 28</p>
@@ -568,7 +576,29 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
     if (built || typeof L === "undefined") return;
     var el = document.getElementById("map");
     if (!el || !el.offsetParent) return;      // details 還沒展開就先不畫
+    // 滾輪縮放預設關閉、點一下地圖才啟用、滑鼠移開再關掉。
+    // 一直開著的話，使用者只是想往下捲頁面、游標剛好經過地圖，
+    // 就會變成縮放地圖而頁面卡住不動。
     map = L.map(el, { scrollWheelZoom: false }).setView([24.806, 120.968], 13);
+    var hint = document.createElement("div");
+    hint.className = "maphint";
+    hint.textContent = "點一下地圖即可用滾輪縮放";
+    el.appendChild(hint);
+    function wheelOn() {
+      map.scrollWheelZoom.enable();
+      el.classList.add("wheel-on");
+      hint.textContent = "滾輪縮放已啟用（滑鼠移開會關閉）";
+    }
+    function wheelOff() {
+      map.scrollWheelZoom.disable();
+      el.classList.remove("wheel-on");
+      hint.textContent = "點一下地圖即可用滾輪縮放";
+    }
+    el.addEventListener("click", wheelOn);
+    el.addEventListener("mouseleave", wheelOff);
+    // 鍵盤使用者：Tab 進來也能用
+    el.addEventListener("focusin", wheelOn);
+    el.addEventListener("focusout", wheelOff);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: "&copy; OpenStreetMap"
