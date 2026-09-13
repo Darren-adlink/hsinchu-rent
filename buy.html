@@ -364,7 +364,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
  <h1>新竹市買房 · 3房2廳2衛以上</h1>
  <p class="stand">591 售屋網的 新竹市 物件，符合條件 <b>1904</b> 間。
   中位價 <b>2,288萬</b>，其中 <b>800 萬以內只有 26 間</b>。</p>
- <p class="stamp">整理時間 2026-09-13 14:32</p>
+ <p class="stamp">整理時間 2026-09-13 14:34</p>
 <p style="margin:6px 0 0"><a class="navlink" href="./" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid var(--accent);border-radius:8px;color:var(--accent);text-decoration:none;font-weight:700;font-size:14px">看租屋 →</a></p>
 </header>
 
@@ -400,6 +400,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
    <span class="unit"><input class="num u" type="number" id="f_room" value="3" inputmode="numeric" aria-label="最少幾房"><b>房</b></span>
    <span class="unit"><input class="num u" type="number" id="f_hall" value="2" inputmode="numeric" aria-label="最少幾廳"><b>廳</b></span>
    <span class="unit"><input class="num u" type="number" id="f_bath" value="2" inputmode="numeric" aria-label="最少幾衛"><b>衛</b></span>
+   <span class="unit"><input class="num u" type="number" id="f_rmax" placeholder="上限" inputmode="numeric" aria-label="最多幾房"><b>房以內</b></span>
   </div>
   <div class="frow">
    <span class="flab">其他</span>
@@ -463,6 +464,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
     var pMin = num("f_pmin"), pMax = num("f_pmax");
     var rMin = num("f_room"), hMin = num("f_hall"), bMin = num("f_bath");
     var aMin = num("f_amin"), aMax = num("f_amax"), ageMax = num("f_agemax");
+    var rMax = num("f_rmax");
     var aliveOnly = $("f_alive").checked;
     var favOnly = $("f_fav") && $("f_fav").checked;
     var kmMax = num("f_km");
@@ -479,6 +481,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
       if (ok && pMax !== null && (p === null || p > pMax)) ok = false;
       // 未知的欄位不因為預設值被濾掉
       if (ok && rMin !== null && d.room !== "" && +d.room < rMin) ok = false;
+      if (ok && rMax !== null && d.room !== "" && +d.room > rMax) ok = false;
       if (ok && hMin !== null && d.hall !== "" && +d.hall < hMin) ok = false;
       if (ok && bMin !== null && d.bath !== "" && +d.bath < bMin) ok = false;
       if (ok && aMin !== null && (d.area === "" || +d.area < aMin)) ok = false;
@@ -530,6 +533,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
   $("f_quick3").addEventListener("click", function () {
     reset();
     $("f_room").value = "2";
+    $("f_rmax").value = "2";        // 剛好 2 房，不含 3 房以上
     $("f_hall").value = "";
     $("f_bath").value = "2";
     $("f_amin").value = "20";

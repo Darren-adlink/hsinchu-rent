@@ -314,7 +314,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
  <p class="stand">從 591、好房網、樂屋網整理出來的 509 間，
   每一間都重新開過網址確認還在。<b>電話直接點就能打</b>，
   不用進原網站（591 手機版要登入綁 LINE 才給看電話，這裡已經幫你抓好了）。</p>
- <p class="stamp">整理時間 2026-09-13 14:32　·
+ <p class="stamp">整理時間 2026-09-13 14:34　·
   東區 357
   北區 188
   香山區 52</p>
@@ -367,6 +367,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
    <span class="unit"><input class="num u" type="number" id="f_room" value="3" inputmode="numeric" aria-label="最少幾房"><b>房</b></span>
    <span class="unit"><input class="num u" type="number" id="f_hall" value="2" inputmode="numeric" aria-label="最少幾廳"><b>廳</b></span>
    <span class="unit"><input class="num u" type="number" id="f_bath" value="2" inputmode="numeric" aria-label="最少幾衛"><b>衛</b></span>
+   <span class="unit"><input class="num u" type="number" id="f_rmax" placeholder="上限" inputmode="numeric" aria-label="最多幾房"><b>房以內</b></span>
    <label class="chip"><input type="checkbox" id="f_elev">要電梯</label>
    <label class="chip"><input type="checkbox" id="f_park">要車位</label>
    <label class="chip"><input type="checkbox" id="f_wor">明確可拜拜</label>
@@ -432,6 +433,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
     var favOnly = $("f_fav") && $("f_fav").checked;
     var kmMax = num("f_km");
     var aMin = num("f_amin"), aMax = num("f_amax");
+    var rMax = num("f_rmax");
     var kw = ($("f_kw").value || "").trim().toLowerCase();
     var shown = 0;
     document.querySelectorAll("table.data tbody tr").forEach(function (tr) {
@@ -514,6 +516,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
   $("f_quick3").addEventListener("click", function () {
     reset();
     $("f_room").value = "2";
+    $("f_rmax").value = "2";        // 剛好 2 房，不含 3 房以上
     $("f_hall").value = "";
     $("f_bath").value = "2";
     $("f_amin").value = "20";
