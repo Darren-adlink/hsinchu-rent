@@ -314,7 +314,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
  <p class="stand">從 591、好房網、樂屋網整理出來的 509 間，
   每一間都重新開過網址確認還在。<b>電話直接點就能打</b>，
   不用進原網站（591 手機版要登入綁 LINE 才給看電話，這裡已經幫你抓好了）。</p>
- <p class="stamp">整理時間 2026-09-13 14:34　·
+ <p class="stamp">整理時間 2026-09-13 14:36　·
   東區 357
   北區 188
   香山區 52</p>
@@ -449,8 +449,11 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
       if (ok && flMin !== null && (f === null || f < flMin)) ok = false;
       if (ok && flMax !== null && (f === null || f > flMax)) ok = false;
       if (ok && noWhole && d.whole === "1") ok = false;
-      if (ok && rMin !== null && (d.room === "" || +d.room < rMin)) ok = false;
-      if (ok && bMin !== null && (d.bath === "" || +d.bath < bMin)) ok = false;
+      // 未知的欄位不因為預設值被濾掉（有些刊登只寫「5房2衛」沒寫廳數）
+      if (ok && rMin !== null && d.room !== "" && +d.room < rMin) ok = false;
+      if (ok && rMax !== null && d.room !== "" && +d.room > rMax) ok = false;
+      if (ok && hMin !== null && d.hall !== "" && +d.hall < hMin) ok = false;
+      if (ok && bMin !== null && d.bath !== "" && +d.bath < bMin) ok = false;
       if (ok && needElev && d.elev !== "\u6709") ok = false;
       if (ok && needPark && d.park !== "\u6709") ok = false;
       if (ok && worOk && d.wor !== "\u53ef") ok = false;
