@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<meta name="referrer" content="no-referrer">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="color-scheme" content="light dark">
 <title>新竹租屋精選</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -314,7 +314,7 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
  <p class="stand">從 591、好房網、樂屋網整理出來的 509 間，
   每一間都重新開過網址確認還在。<b>電話直接點就能打</b>，
   不用進原網站（591 手機版要登入綁 LINE 才給看電話，這裡已經幫你抓好了）。</p>
- <p class="stamp">整理時間 2026-09-13 14:36　·
+ <p class="stamp">整理時間 2026-09-14 14:14　·
   東區 357
   北區 188
   香山區 52</p>
@@ -626,10 +626,25 @@ summary .mapcount{margin-left:auto;font-weight:700;color:var(--accent)}
     // 鍵盤使用者：Tab 進來也能用
     el.addEventListener("focusin", wheelOn);
     el.addEventListener("focusout", wheelOff);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution: "&copy; OpenStreetMap"
-    }).addTo(map);
+    // 圖磚改用 Carto（免費、允許小流量個人用、CDN 快）。
+    // 坑：OSM 官方圖磚 tile.openstreetmap.org 對沒有 Referer 的請求會回 403
+    // "Access blocked"，整張地圖變成一格格警告 —— 之前全頁設了 no-referrer 就中招。
+    // 若 Carto 掛了，onerror 自動退回 OSM（此時 Referer 已修好，不會再被擋）。
+    var carto = L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19, subdomains: "abcd",
+      attribution: "&copy; OpenStreetMap &copy; CARTO"
+    });
+    var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19, attribution: "&copy; OpenStreetMap"
+    });
+    var tileErrors = 0;
+    carto.on("tileerror", function () {
+      if (++tileErrors >= 6 && map.hasLayer(carto)) {
+        map.removeLayer(carto); osm.addTo(map);
+      }
+    });
+    carto.addTo(map);
     layer = L.layerGroup().addTo(map);
     // 參考點與 2 公里圈
     L.circle([REF.lat, REF.lng], {
