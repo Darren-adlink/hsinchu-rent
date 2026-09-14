@@ -1,0 +1,7 @@
+{
+ "updated": null,
+ "ok": false,
+ "finished": false,
+ "watchdog": "2026-09-14 的每日更新沒有跑完。排程可能沒啟動、或腳本中途失敗。請看 out\\daily\\2026-09-14.log 與 pythonw_stdout.log。",
+ "checked": "2026-09-14 16:54"
+}
