@@ -1,10 +1,7 @@
 {
- "updated": "2026-09-17 10:44",
- "ok": true,
+ "updated": "2026-09-17 13:42",
+ "ok": false,
  "finished": true,
- "phases": {
-  "租屋 · 重驗網址": true,
-  "買屋 · 重驗網址": true
- },
+ "phases": {},
  "stop_date": "2026-12-01"
 }
