@@ -1,7 +1,13 @@
 {
- "updated": "2026-09-21 05:49",
- "ok": false,
- "finished": false,
- "watchdog": "2026-09-21 的每日更新沒有跑完。排程可能沒啟動、或腳本中途失敗。請看 out\\daily\\2026-09-21.log 與 pythonw_stdout.log。",
- "checked": "2026-09-21 08:27"
+ "updated": "2026-09-21 08:27",
+ "ok": true,
+ "finished": true,
+ "phases": {
+  "租屋 · 重驗網址": true,
+  "買屋 · 重驗網址": true,
+  "買屋 · 房仲三家": true,
+  "FB · 匯入": true,
+  "買屋 · 明細(座標/管理費/車位)": true
+ },
+ "stop_date": "2026-12-01"
 }
