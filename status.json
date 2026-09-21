@@ -1,7 +1,13 @@
 {
- "updated": "2026-09-21 08:27",
- "ok": false,
- "finished": false,
- "watchdog": "測試：這是通知中心 toast，不是彈窗（可忽略）",
- "checked": "2026-09-21 08:32"
+ "updated": "2026-09-21 08:32",
+ "ok": true,
+ "finished": true,
+ "phases": {
+  "租屋 · 重驗網址": true,
+  "買屋 · 重驗網址": true,
+  "買屋 · 房仲三家": true,
+  "FB · 匯入": true,
+  "買屋 · 明細(座標/管理費/車位)": true
+ },
+ "stop_date": "2026-12-01"
 }
